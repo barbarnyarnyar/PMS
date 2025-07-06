@@ -144,8 +144,12 @@ public class Guest {
   public void setPreferences(String preferences) {
     this.preferences = preferences;
   }
-}
 
-enum IdType {
-  PASSPORT, DRIVER_LICENSE, NATIONAL_ID
+  public IdType getIdType() {
+    return idType;
+  }
+
+  public void setIdType(IdType idType) {
+    this.idType = idType;
+  }
 }
