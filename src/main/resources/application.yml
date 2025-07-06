@@ -1,25 +1,27 @@
+# Application configuration for MySQL
 spring:
   application:
     name: tolimoli-pms
   
-  # Database
+  # MySQL Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/pms_db
-    username: pms_user
-    password: pms_password
-    driver-class-name: org.postgresql.Driver
-  
-  # JPA
+    url: jdbc:mysql://host.docker.internal:3306/pms_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  # JPA Configuration for MySQL
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update  # Creates tables automatically
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+    open-in-view: false
 
-# Server
+# Server Configuration
 server:
   port: 8080
 
@@ -28,3 +30,28 @@ logging:
   level:
     com.tolimoli.pms: INFO
     org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+---
+# Docker profile - when running app in Docker
+spring:
+  config:
+    activate:
+      on-profile: docker
+  
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3306/pms_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+
+---
+# Local profile - when running app locally
+spring:
+  config:
+    activate:
+      on-profile: local
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/pms_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
