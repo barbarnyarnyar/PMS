@@ -1,0 +1,241 @@
+# Main Application Configuration
+spring:
+  application:
+    name: tolimoli-pms
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:pms_db}
+    username: ${DB_USERNAME:pms_user}
+    password: ${DB_PASSWORD:pms_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      auto-commit: false
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+  
+  # Flyway Migration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 2000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes
+  
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 3
+  
+  # Jackson Configuration
+  jackson:
+    default-property-inclusion: NON_NULL
+    time-zone: UTC
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+  
+  # Mail Configuration
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  
+  # File Upload Configuration
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  # Security Configuration
+  security:
+    user:
+      name: admin
+      password: ${ADMIN_PASSWORD:admin123}
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+  forward-headers-strategy: framework
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Logging Configuration
+logging:
+  level:
+    com.tolimoli.pms: ${LOG_LEVEL:INFO}
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/pms.log
+
+# Management & Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:tolimoli-pms-secret-key-2024-very-long-secret-key}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
+
+# Payment Configuration
+payment:
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY:sk_test_...}
+    public-key: ${STRIPE_PUBLIC_KEY:pk_test_...}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_...}
+
+# Email Service Configuration
+notification:
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY:}
+    from-email: ${FROM_EMAIL:noreply@tolimoli.com}
+    from-name: ${FROM_NAME:Tolimoli PMS}
+  
+  # SMS Configuration
+  twilio:
+    account-sid: ${TWILIO_ACCOUNT_SID:}
+    auth-token: ${TWILIO_AUTH_TOKEN:}
+    phone-number: ${TWILIO_PHONE_NUMBER:}
+
+# File Storage Configuration
+aws:
+  s3:
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+    bucket-name: ${AWS_S3_BUCKET:tolimoli-pms-files}
+    region: ${AWS_REGION:us-east-1}
+
+# Elasticsearch Configuration
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST:localhost}
+  port: ${ELASTICSEARCH_PORT:9200}
+  username: ${ELASTICSEARCH_USERNAME:}
+  password: ${ELASTICSEARCH_PASSWORD:}
+
+# Channel Manager Configuration
+channel:
+  booking-com:
+    api-url: ${BOOKING_COM_API_URL:https://supply-xml.booking.com}
+    username: ${BOOKING_COM_USERNAME:}
+    password: ${BOOKING_COM_PASSWORD:}
+  
+  expedia:
+    api-url: ${EXPEDIA_API_URL:https://services.expediapartnercentral.com}
+    username: ${EXPEDIA_USERNAME:}
+    password: ${EXPEDIA_PASSWORD:}
+
+# Application Specific Configuration
+app:
+  name: Tolimoli PMS
+  version: 1.0.0
+  description: All-in-one Hotel Property Management System
+  
+  # Business Rules
+  business:
+    default-checkin-time: "15:00"
+    default-checkout-time: "11:00"
+    max-advance-booking-days: 365
+    min-advance-booking-hours: 2
+    cancellation-deadline-hours: 24
+    
+  # Rate Limiting
+  rate-limit:
+    api:
+      requests-per-minute: 100
+      requests-per-hour: 1000
+    booking:
+      requests-per-minute: 20
+      requests-per-hour: 200
+
+# Thread Pool Configuration
+async:
+  core-pool-size: 2
+  max-pool-size: 5
+  queue-capacity: 100
+  thread-name-prefix: "pms-async-"
+
+# API Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  show-actuator: true

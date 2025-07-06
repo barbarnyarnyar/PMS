@@ -1,0 +1,72 @@
+# application-prod.yml - Production Environment
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  datasource:
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 20
+      minimum-idle: 10
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  http2:
+    enabled: true
+
+logging:
+  level:
+    com.tolimoli.pms: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.apache: WARN
+  file:
+    name: /var/log/pms/application.log
+    max-size: 100MB
+    max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: never
+
+app:
+  cors:
+    allowed-origins: "${ALLOWED_ORIGINS:https://pms.tolimoli.com}"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allowed-headers: "*"
+    allow-credentials: true
+
+# Production security settings
+jwt:
+  expiration: 43200000 # 12 hours in production
+
+# Rate limiting in production
+app:
+  rate-limit:
+    api:
+      requests-per-minute: 60
+      requests-per-hour: 500
+    booking:
+      requests-per-minute: 10
+      requests-per-hour: 100

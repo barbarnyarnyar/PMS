@@ -1,0 +1,63 @@
+# application-test.yml - Test Environment
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+  flyway:
+    enabled: false
+  
+  h2:
+    console:
+      enabled: true
+  
+  # Test Redis (use embedded or testcontainers)
+  data:
+    redis:
+      host: localhost
+      port: 6370
+  
+  # Test RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5673
+
+server:
+  port: 0 # Random port for tests
+
+logging:
+  level:
+    com.tolimoli.pms: WARN
+    org.springframework.test: WARN
+    org.testcontainers: WARN
+
+jwt:
+  secret: test-secret-key-for-testing-only
+  expiration: 3600000 # 1 hour for tests
+
+# Disable external services in tests
+notification:
+  sendgrid:
+    enabled: false
+  twilio:
+    enabled: false
+
+payment:
+  stripe:
+    enabled: false
+
+aws:
+  s3:
+    enabled: false

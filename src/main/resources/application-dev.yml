@@ -1,0 +1,50 @@
+# application-dev.yml - Development Environment
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pms_dev
+    username: pms_user
+    password: pms_password
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+  
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.tolimoli.pms: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  cors:
+    allowed-origins: "http://localhost:4200,http://localhost:3000"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    allow-credentials: true
+
+jwt:
+  secret: dev-secret-key-for-development-only
+  expiration: 86400000 # 24 hours
