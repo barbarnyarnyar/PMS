@@ -1,10 +1,10 @@
+# Development version with hot reload
 version: '3.8'
 
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: pms-db
+    container_name: pms-db-dev
     environment:
       POSTGRES_DB: pms_db
       POSTGRES_USER: pms_user
@@ -12,29 +12,29 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pms_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pms_user -d pms_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - pms_dev_data:/var/lib/postgresql/data
 
-  # PMS Application
-  pms-app:
+  # Development app with Maven and hot reload
+  pms-app-dev:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: pms-app
+      dockerfile: Dockerfile.dev
+    container_name: pms-app-dev
     ports:
       - "8080:8080"
+      - "5005:5005"  # Debug port
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/pms_db
       - SPRING_DATASOURCE_USERNAME=pms_user
       - SPRING_DATASOURCE_PASSWORD=pms_password
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true
+    volumes:
+      - ./src:/app/src  # Mount source code for hot reload
+      - maven_cache:/root/.m2  # Cache Maven dependencies
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     restart: unless-stopped
 
 volumes:
-  pms_data:
+  pms_dev_data:
+  maven_cache:

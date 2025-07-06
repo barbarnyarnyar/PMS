@@ -1,0 +1,13 @@
+# Exclude files from Docker build context
+target/
+.git/
+.gitignore
+README.md
+*.md
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.log
+docker-compose.yml
+Dockerfile
