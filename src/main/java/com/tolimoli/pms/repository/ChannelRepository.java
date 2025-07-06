@@ -25,4 +25,6 @@ public interface ChannelRepository extends JpaRepository<Channel, Long>,
     List<Channel> findByIsActive(Boolean isActive);
 
     Optional<Channel> findByChannelCode(String channelCode);
+
+    Optional<Channel> findById(Long channelId);
 }

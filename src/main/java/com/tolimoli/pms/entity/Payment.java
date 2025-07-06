@@ -40,6 +40,22 @@ public class Payment {
     this.paymentMethod = paymentMethod;
   }
 
+  public LocalDateTime getPaymentDate() {
+    return paymentDate;
+  }
+
+  public void setPaymentDate(LocalDateTime paymentDate) {
+    this.paymentDate = paymentDate;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
   // Business methods
   public boolean isSuccessful() {
     return paymentStatus == PaymentStatus.COMPLETED;
@@ -56,12 +72,52 @@ public class Payment {
   public boolean isRefunded() {
     return paymentStatus == PaymentStatus.REFUNDED;
   }
-}
 
-enum PaymentMethod {
-  CREDIT_CARD, DEBIT_CARD, CASH, BANK_TRANSFER, CORPORATE_BILLING
-}
+    public BigDecimal getAmount() {
+    return amount;
+  }
 
-enum PaymentStatus {
-  PENDING, COMPLETED, FAILED, REFUNDED, CANCELLED
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
+  }
+
+  public PaymentMethod getPaymentMethod() {
+    return paymentMethod;
+  }
+
+  public void setPaymentMethod(PaymentMethod paymentMethod) {
+    this.paymentMethod = paymentMethod;
+  }
+
+  public PaymentStatus getPaymentStatus() {
+    return paymentStatus;
+  }
+
+  public void setPaymentStatus(PaymentStatus paymentStatus) {
+    this.paymentStatus = paymentStatus;
+  }
+
+    public String getTransactionId() {
+    return transactionId;
+  }
+
+  public void setTransactionId(String transactionId) {
+    this.transactionId = transactionId;
+  }
+
+  public String getCardLastFour() {
+    return cardLastFour;
+  }
+
+  public void setCardLastFour(String cardLastFour) {
+    this.cardLastFour = cardLastFour;
+  }
+
+  public Reservation getReservation() {
+    return reservation;
+  }
+
+  public void setReservation(Reservation reservation) {
+    this.reservation = reservation;
+  }
 }
