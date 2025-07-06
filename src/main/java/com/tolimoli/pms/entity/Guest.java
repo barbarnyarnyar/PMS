@@ -96,6 +96,54 @@ public class Guest {
   public void setPhone(String phone) {
     this.phone = phone;
   }
+
+  public String getIdNumber() {
+    return idNumber;
+  }
+
+  public void setIdNumber(String idNumber) {
+    this.idNumber = idNumber;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public String getCity() {
+    return city;
+  }
+
+  public void setCity(String city) {
+    this.city = city;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
+  public LocalDate getDateOfBirth() {
+    return dateOfBirth;
+  }
+
+  public void setDateOfBirth(LocalDate dateOfBirth) {
+    this.dateOfBirth = dateOfBirth;
+  }
+
+  public String getPreferences() {
+    return preferences;
+  }
+
+  public void setPreferences(String preferences) {
+    this.preferences = preferences;
+  }
 }
 
 enum IdType {
