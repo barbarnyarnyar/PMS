@@ -36,7 +36,7 @@ public class ChannelController {
             @RequestParam String channelCode,
             @RequestParam(required = false) BigDecimal commissionRate,
             @RequestParam(required = false) String apiEndpoint) {
-        
+
         Channel channel = channelService.createChannel(channelName, channelCode, commissionRate, apiEndpoint);
         ApiResponse<Channel> response = new ApiResponse<>("success", "Channel created successfully", channel);
         return ResponseEntity.ok(response);
@@ -48,7 +48,8 @@ public class ChannelController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Channel>>> getAllActiveChannels() {
         List<Channel> channels = channelService.getAllActiveChannels();
-        ApiResponse<List<Channel>> response = new ApiResponse<>("success", "Active channels retrieved successfully", channels);
+        ApiResponse<List<Channel>> response = new ApiResponse<>("success", "Active channels retrieved successfully",
+                channels);
         return ResponseEntity.ok(response);
     }
 

@@ -39,7 +39,7 @@ public class FolioChargeController {
             @RequestParam String description,
             @RequestParam BigDecimal amount,
             @RequestParam ChargeType chargeType) {
-        
+
         FolioCharge charge = folioChargeService.addServiceCharge(reservationId, description, amount, chargeType);
         ApiResponse<FolioCharge> response = new ApiResponse<>("success", "Service charge added successfully", charge);
         return ResponseEntity.ok(response);
@@ -55,9 +55,11 @@ public class FolioChargeController {
             @RequestParam BigDecimal unitPrice,
             @RequestParam Integer quantity,
             @RequestParam ChargeType chargeType) {
-        
-        FolioCharge charge = folioChargeService.addChargeWithQuantity(reservationId, description, unitPrice, quantity, chargeType);
-        ApiResponse<FolioCharge> response = new ApiResponse<>("success", "Charge with quantity added successfully", charge);
+
+        FolioCharge charge = folioChargeService.addChargeWithQuantity(reservationId, description, unitPrice, quantity,
+                chargeType);
+        ApiResponse<FolioCharge> response = new ApiResponse<>("success", "Charge with quantity added successfully",
+                charge);
         return ResponseEntity.ok(response);
     }
 
@@ -67,7 +69,8 @@ public class FolioChargeController {
     @GetMapping("/reservation/{reservationId}")
     public ResponseEntity<ApiResponse<List<FolioCharge>>> getReservationCharges(@PathVariable Long reservationId) {
         List<FolioCharge> charges = folioChargeService.getReservationCharges(reservationId);
-        ApiResponse<List<FolioCharge>> response = new ApiResponse<>("success", "Charges retrieved successfully", charges);
+        ApiResponse<List<FolioCharge>> response = new ApiResponse<>("success", "Charges retrieved successfully",
+                charges);
         return ResponseEntity.ok(response);
     }
 
@@ -77,13 +80,13 @@ public class FolioChargeController {
     @GetMapping("/reservation/{reservationId}/total")
     public ResponseEntity<ApiResponse<Map<String, Object>>> calculateTotalCharges(@PathVariable Long reservationId) {
         BigDecimal totalCharges = folioChargeService.calculateTotalCharges(reservationId);
-        
+
         Map<String, Object> chargeInfo = Map.of(
                 "reservationId", reservationId,
-                "totalCharges", totalCharges
-        );
-        
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success", "Total charges calculated successfully", chargeInfo);
+                "totalCharges", totalCharges);
+
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success",
+                "Total charges calculated successfully", chargeInfo);
         return ResponseEntity.ok(response);
     }
 
@@ -93,7 +96,8 @@ public class FolioChargeController {
     @PutMapping("/reservation/{reservationId}/mark-paid")
     public ResponseEntity<ApiResponse<String>> markChargesAsPaid(@PathVariable Long reservationId) {
         folioChargeService.markChargesAsPaid(reservationId);
-        ApiResponse<String> response = new ApiResponse<>("success", "Charges marked as paid successfully", "All charges marked as paid");
+        ApiResponse<String> response = new ApiResponse<>("success", "Charges marked as paid successfully",
+                "All charges marked as paid");
         return ResponseEntity.ok(response);
     }
 }

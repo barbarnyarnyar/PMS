@@ -32,7 +32,8 @@ public class HelloWorldController {
     @GetMapping
     public ResponseEntity<ApiResponse<String>> hello() {
         String message = "Hello World from Tolimoli PMS!";
-        ApiResponse<String> response = new ApiResponse<>("success", "Hello World message retrieved successfully", message);
+        ApiResponse<String> response = new ApiResponse<>("success", "Hello World message retrieved successfully",
+                message);
         return ResponseEntity.ok(response);
     }
 
@@ -42,7 +43,8 @@ public class HelloWorldController {
     @GetMapping("/{name}")
     public ResponseEntity<ApiResponse<String>> helloWithName(@PathVariable String name) {
         String message = "Hello " + name + " from Tolimoli PMS!";
-        ApiResponse<String> response = new ApiResponse<>("success", "Personalized hello message retrieved successfully", message);
+        ApiResponse<String> response = new ApiResponse<>("success", "Personalized hello message retrieved successfully",
+                message);
         return ResponseEntity.ok(response);
     }
 
@@ -54,7 +56,8 @@ public class HelloWorldController {
             @RequestParam(value = "name", defaultValue = "Guest") String name,
             @RequestParam(value = "greeting", defaultValue = "Hello") String greeting) {
         String message = greeting + " " + name + "! Welcome to Tolimoli PMS.";
-        ApiResponse<String> response = new ApiResponse<>("success", "Custom greeting message retrieved successfully", message);
+        ApiResponse<String> response = new ApiResponse<>("success", "Custom greeting message retrieved successfully",
+                message);
         return ResponseEntity.ok(response);
     }
 
@@ -70,7 +73,8 @@ public class HelloWorldController {
         responseData.put("timestamp", LocalDateTime.now());
         responseData.put("from", "Tolimoli PMS System");
 
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success", "Hello message processed successfully", responseData);
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success", "Hello message processed successfully",
+                responseData);
         return ResponseEntity.ok(response);
     }
 
@@ -86,7 +90,8 @@ public class HelloWorldController {
         healthData.put("timestamp", LocalDateTime.now());
         healthData.put("message", "Service is running properly");
 
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success", "Health check completed successfully", healthData);
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>("success", "Health check completed successfully",
+                healthData);
         return ResponseEntity.ok(response);
     }
 
@@ -97,7 +102,8 @@ public class HelloWorldController {
         private String message;
         private String sender;
 
-        public HelloRequest() {}
+        public HelloRequest() {
+        }
 
         public HelloRequest(String message, String sender) {
             this.message = message;
