@@ -11,6 +11,8 @@ import com.tolimoli.pms.entity.Payment;
 import com.tolimoli.pms.entity.PaymentMethod;
 import com.tolimoli.pms.entity.PaymentStatus;
 import com.tolimoli.pms.entity.Reservation;
+import com.tolimoli.pms.exception.ResourceNotFoundException;
+import com.tolimoli.pms.exception.BusinessLogicException;
 import com.tolimoli.pms.repository.PaymentRepository;
 import com.tolimoli.pms.repository.ReservationRepository;
 
@@ -33,8 +35,32 @@ public class PaymentService {
   // Process payment
   public Payment processPayment(Long reservationId, BigDecimal amount,
       PaymentMethod paymentMethod, String transactionId) {
+    
+    // Validate input parameters
+    if (reservationId == null) {
+      throw new IllegalArgumentException("Reservation ID is required");
+    }
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Payment amount must be greater than zero");
+    }
+    if (paymentMethod == null) {
+      throw new IllegalArgumentException("Payment method is required");
+    }
+    
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new RuntimeException("Reservation not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Reservation", reservationId));
+
+    // Check if reservation is in a state that allows payment
+    if (reservation.getStatus() == com.tolimoli.pms.entity.ReservationStatus.CANCELLED) {
+      throw new BusinessLogicException("Cannot process payment for cancelled reservation");
+    }
+
+    // Check if payment amount is reasonable (not exceeding outstanding balance by too much)
+    BigDecimal outstandingBalance = getOutstandingBalance(reservationId);
+    if (amount.compareTo(outstandingBalance.multiply(new BigDecimal("2"))) > 0) {
+      throw new BusinessLogicException("Payment amount (" + amount + 
+          ") significantly exceeds outstanding balance (" + outstandingBalance + ")");
+    }
 
     Payment payment = new Payment();
     payment.setReservation(reservation);
@@ -83,8 +109,26 @@ public class PaymentService {
 
   // Process refund
   public Payment processRefund(Long originalPaymentId, BigDecimal refundAmount) {
+    if (originalPaymentId == null) {
+      throw new IllegalArgumentException("Original payment ID is required");
+    }
+    if (refundAmount == null || refundAmount.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Refund amount must be greater than zero");
+    }
+    
     Payment originalPayment = paymentRepository.findById(originalPaymentId)
-        .orElseThrow(() -> new RuntimeException("Original payment not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Payment", originalPaymentId));
+
+    // Validate refund amount doesn't exceed original payment
+    if (refundAmount.compareTo(originalPayment.getAmount()) > 0) {
+      throw new BusinessLogicException("Refund amount (" + refundAmount + 
+          ") cannot exceed original payment amount (" + originalPayment.getAmount() + ")");
+    }
+
+    // Check if original payment is successful
+    if (originalPayment.getPaymentStatus() != PaymentStatus.COMPLETED) {
+      throw new BusinessLogicException("Can only refund completed payments");
+    }
 
     Payment refund = new Payment();
     refund.setReservation(originalPayment.getReservation());
@@ -94,6 +138,14 @@ public class PaymentService {
     refund.setTransactionId("REFUND-" + originalPayment.getTransactionId());
     refund.setPaymentDate(LocalDateTime.now());
 
-    return paymentRepository.save(refund);
+    Payment savedRefund = paymentRepository.save(refund);
+
+    // Update reservation paid amount
+    Reservation reservation = originalPayment.getReservation();
+    BigDecimal currentPaid = reservation.getPaidAmount();
+    reservation.setPaidAmount(currentPaid.subtract(refundAmount));
+    reservationRepository.save(reservation);
+
+    return savedRefund;
   }
 }

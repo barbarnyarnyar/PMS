@@ -152,4 +152,28 @@ public class Guest {
   public void setIdType(IdType idType) {
     this.idType = idType;
   }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  public List<Reservation> getReservations() {
+    return reservations;
+  }
+
+  public void setReservations(List<Reservation> reservations) {
+    this.reservations = reservations;
+  }
 }

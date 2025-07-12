@@ -14,6 +14,8 @@ import com.tolimoli.pms.entity.Room;
 import com.tolimoli.pms.entity.Channel;
 import com.tolimoli.pms.entity.RoomType;
 import com.tolimoli.pms.entity.ReservationStatus;
+import com.tolimoli.pms.exception.ResourceNotFoundException;
+import com.tolimoli.pms.exception.BusinessLogicException;
 import com.tolimoli.pms.repository.ReservationRepository;
 
 import jakarta.transaction.Transactional;
@@ -43,25 +45,59 @@ public class ReservationService {
       LocalDate checkInDate, LocalDate checkOutDate,
       Integer numberOfGuests, String specialRequests) {
 
+    // Validate input parameters
+    if (guestEmail == null || guestEmail.trim().isEmpty()) {
+      throw new IllegalArgumentException("Guest email is required");
+    }
+    if (roomNumber == null || roomNumber.trim().isEmpty()) {
+      throw new IllegalArgumentException("Room number is required");
+    }
+    if (channelCode == null || channelCode.trim().isEmpty()) {
+      throw new IllegalArgumentException("Channel code is required");
+    }
+    if (checkInDate == null || checkOutDate == null) {
+      throw new IllegalArgumentException("Check-in and check-out dates are required");
+    }
+    if (!checkOutDate.isAfter(checkInDate)) {
+      throw new IllegalArgumentException("Check-out date must be after check-in date");
+    }
+    if (numberOfGuests == null || numberOfGuests <= 0) {
+      throw new IllegalArgumentException("Number of guests must be greater than 0");
+    }
+
     // Get guest
     Guest guest = guestService.findGuestByEmail(guestEmail)
-        .orElseThrow(() -> new RuntimeException("Guest not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Guest", "email", guestEmail));
 
     // Get room
     Room room = roomService.getRoomByNumber(roomNumber)
-        .orElseThrow(() -> new RuntimeException("Room not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Room", "roomNumber", roomNumber));
 
     // Get channel
     Channel channel = channelService.getChannelByCode(channelCode)
-        .orElseThrow(() -> new RuntimeException("Channel not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Channel", "channelCode", channelCode));
 
-    // Check availability
+    // Check room availability
     if (!room.isAvailable()) {
-      throw new RuntimeException("Room not available");
+      throw new BusinessLogicException("Room " + roomNumber + " is not available");
     }
 
-    // Generate confirmation number
+    // Check room capacity
+    if (numberOfGuests > room.getCapacity()) {
+      throw new BusinessLogicException("Number of guests (" + numberOfGuests + 
+          ") exceeds room capacity (" + room.getCapacity() + ")");
+    }
+
+    // Check for conflicting reservations
+    if (!reservationRepository.isRoomAvailable(room.getId(), checkInDate, checkOutDate)) {
+      throw new BusinessLogicException("Room " + roomNumber + " is not available for the selected dates");
+    }
+
+    // Generate unique confirmation number
     String confirmationNumber = generateConfirmationNumber();
+    while (reservationRepository.existsByConfirmationNumber(confirmationNumber)) {
+      confirmationNumber = generateConfirmationNumber();
+    }
 
     // Create reservation
     Reservation reservation = new Reservation();
@@ -77,6 +113,9 @@ public class ReservationService {
 
     // Calculate total amount
     Long nights = reservation.getDurationInDays();
+    if (nights <= 0) {
+      throw new BusinessLogicException("Invalid stay duration: " + nights + " nights");
+    }
     BigDecimal totalAmount = room.getBaseRate().multiply(new BigDecimal(nights));
     reservation.setTotalAmount(totalAmount);
 
@@ -90,8 +129,17 @@ public class ReservationService {
 
   // Check-in guest
   public Reservation checkInGuest(Long reservationId) {
+    if (reservationId == null) {
+      throw new IllegalArgumentException("Reservation ID is required");
+    }
+    
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new RuntimeException("Reservation not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Reservation", reservationId));
+
+    if (!reservation.canCheckIn()) {
+      throw new BusinessLogicException("Cannot check in reservation " + 
+          reservation.getConfirmationNumber() + " - invalid status or date");
+    }
 
     reservation.checkIn();
     return reservationRepository.save(reservation);
@@ -99,8 +147,17 @@ public class ReservationService {
 
   // Check-out guest
   public Reservation checkOutGuest(Long reservationId) {
+    if (reservationId == null) {
+      throw new IllegalArgumentException("Reservation ID is required");
+    }
+    
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new RuntimeException("Reservation not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Reservation", reservationId));
+
+    if (!reservation.canCheckOut()) {
+      throw new BusinessLogicException("Cannot check out reservation " + 
+          reservation.getConfirmationNumber() + " - guest is not checked in");
+    }
 
     reservation.checkOut();
     return reservationRepository.save(reservation);
@@ -117,6 +174,10 @@ public class ReservationService {
   }
 
   private String generateConfirmationNumber() {
-    return "RES" + System.currentTimeMillis();
+    // Generate a more readable confirmation number format: RES-YYYYMMDD-XXXXX
+    java.time.LocalDate today = LocalDate.now();
+    String dateStr = today.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String randomPart = String.format("%05d", (int)(Math.random() * 100000));
+    return "RES-" + dateStr + "-" + randomPart;
   }
 }

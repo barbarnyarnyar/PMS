@@ -2,24 +2,24 @@
 
 services:
   # PostgreSQL Database - Intel compatible
-  # postgres:
-  #   image: postgres:14  # Stable version for Intel
-  #   # platform: linux/amd64  # Explicit Intel platform
-  #   container_name: pms-db
-  #   environment:
-  #     POSTGRES_DB: pms_db
-  #     POSTGRES_USER: pms_user
-  #     POSTGRES_PASSWORD: pms_password
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - pms_data:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U pms_user -d pms_db"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   restart: unless-stopped
+  postgres:
+    image: postgres:14  # Stable version for Intel
+    # platform: linux/amd64  # Explicit Intel platform
+    container_name: pms-db
+    environment:
+      POSTGRES_DB: pms_db
+      POSTGRES_USER: pms_user
+      POSTGRES_PASSWORD: pms_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pms_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pms_user -d pms_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   # PMS Application (Intel Mac compatible)
   pms-app:
@@ -31,8 +31,11 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - DB_USERNAME=root
-      - DB_PASSWORD=${MYSQL_PASSWORD:-password}
+      - DB_USERNAME=pms_user
+      - DB_PASSWORD=pms_password
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
