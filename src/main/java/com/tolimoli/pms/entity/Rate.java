@@ -1,6 +1,6 @@
 package com.tolimoli.pms.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ public class Rate {
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 
-  @Column(nullable = false)
+  @Column(name = "rate_date", nullable = false)
   private LocalDate rateDate;
 
   @Column(nullable = false, precision = 10, scale = 2)

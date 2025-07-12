@@ -15,7 +15,7 @@ import com.tolimoli.pms.repository.ChannelRepository;
 import com.tolimoli.pms.repository.RateRepository;
 import com.tolimoli.pms.repository.RoomRepository;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 // ===== 7. RATE SERVICE =====
 @Service

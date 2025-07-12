@@ -1,8 +1,7 @@
 package com.tolimoli.pms.dto.request;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
 
 /**
  * Guest Request DTO for creating new guests
@@ -31,6 +30,63 @@ public class GuestRequest {
   private String dietaryRestrictions;
   private String accessibilityNeeds;
   private String communicationPreferences;
+
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String phone;
+  private String idType;
+
+  public GuestRequest() {
+  }
+
+  public GuestRequest(String firstName, String lastName, String email, String phone, String idType) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.idType = idType;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
+  public String getIdType() {
+    return idType;
+  }
+
+  public void setIdType(String idType) {
+    this.idType = idType;
+  }
 
   // Getters and Setters
   public String getRoomPreferences() {

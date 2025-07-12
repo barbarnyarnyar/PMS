@@ -16,7 +16,7 @@ import com.tolimoli.pms.exception.BusinessLogicException;
 import com.tolimoli.pms.repository.PaymentRepository;
 import com.tolimoli.pms.repository.ReservationRepository;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 // ===== 6. PAYMENT SERVICE =====
 @Service

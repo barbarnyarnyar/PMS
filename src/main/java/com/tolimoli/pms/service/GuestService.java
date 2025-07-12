@@ -1,67 +1,63 @@
 package com.tolimoli.pms.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.tolimoli.pms.entity.Guest;
+import com.tolimoli.pms.repository.GuestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import javax.transaction.Transactional;
+import java.util.Optional;
 
-import com.tolimoli.pms.entity.Guest;
-import com.tolimoli.pms.entity.IdType;
-import com.tolimoli.pms.entity.Reservation;
-import com.tolimoli.pms.repository.GuestRepository;
-
-import jakarta.transaction.Transactional;
-
-// ===== 2. GUEST SERVICE =====
 @Service
 @Transactional
 public class GuestService {
 
-  @Autowired
-  private GuestRepository guestRepository;
+    @Autowired
+    private GuestRepository guestRepository;
 
-  // Create guest
-  public Guest createGuest(String firstName, String lastName, String email, String phone,
-      String idNumber, IdType idType) {
-    // Check if guest already exists
-    Optional<Guest> existingGuest = guestRepository.findByEmail(email);
-    if (existingGuest.isPresent()) {
-      return existingGuest.get(); // Return existing guest
+    /**
+     * Creates a new guest.
+     * @param guestRequest DTO with new guest information.
+     * @return DTO of the created guest.
+     */
+    // public GuestResponse createGuest(GuestRequest guestRequest) {
+    //     // Check if a guest with the same email already exists
+    //     if (guestRepository.existsByEmail(guestRequest.getEmail())) {
+    //         throw new BusinessLogicException("A guest with email " + guestRequest.getEmail() + " already exists.");
+    //     }
+
+    //     // Map DTO to entity. Assumes GuestRequest has corresponding getters.
+    //     Guest guest = new Guest();
+    //     guest.setFirstName(guestRequest.getFirstName());
+    //     guest.setLastName(guestRequest.getLastName());
+    //     guest.setEmail(guestRequest.getEmail());
+    //     guest.setPhone(guestRequest.getPhone());
+    //     guest.setIdType(guestRequest.getIdType());
+    //     guest.setIdNumber(guestRequest.getIdNumber());
+
+    //     Guest savedGuest = guestRepository.save(guest);
+
+    //     // Map entity to response DTO.
+    //     return mapToGuestResponse(savedGuest);
+    // }
+
+    /**
+     * Finds a guest by their email address.
+     * This method is required by ReservationService.
+     * @param email The email of the guest to find.
+     * @return An Optional containing the Guest if found.
+     */
+    public Optional<Guest> findGuestByEmail(String email) {
+        return guestRepository.findByEmail(email);
     }
 
-    Guest guest = new Guest();
-    guest.setFirstName(firstName);
-    guest.setLastName(lastName);
-    guest.setEmail(email);
-    guest.setPhone(phone);
-    guest.setIdNumber(idNumber);
-    guest.setIdType(idType);
+    /**
+     * Helper method to map a Guest entity to a GuestResponse DTO.
+     */
+    // private GuestResponse mapToGuestResponse(Guest guest) {
+    //     // This mapping logic could also be in a dedicated mapper class.
+    //     // Assumes GuestResponse has setters for these fields.
+    //     return new GuestResponse(guest.getId(), guest.getFirstName(), guest.getLastName(), guest.getEmail(), guest.getPhone());
+    // }
 
-    return guestRepository.save(guest);
-  }
-
-  // Find guest by email
-  public Optional<Guest> findGuestByEmail(String email) {
-    return guestRepository.findByEmail(email);
-  }
-
-  // Get guest history
-  public List<Reservation> getGuestHistory(Long guestId) {
-    return guestRepository.findGuestReservations(guestId);
-  }
-
-  // Update guest info
-  public Guest updateGuest(Long guestId, String firstName, String lastName,
-      String phone, String address) {
-    Guest guest = guestRepository.findById(guestId)
-        .orElseThrow(() -> new RuntimeException("Guest not found"));
-
-    guest.setFirstName(firstName);
-    guest.setLastName(lastName);
-    guest.setPhone(phone);
-    guest.setAddress(address);
-
-    return guestRepository.save(guest);
-  }
+    // Other methods to implement the rest of GuestController's endpoints would go here.
 }

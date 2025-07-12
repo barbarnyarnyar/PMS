@@ -18,7 +18,7 @@ import com.tolimoli.pms.exception.ResourceNotFoundException;
 import com.tolimoli.pms.exception.BusinessLogicException;
 import com.tolimoli.pms.repository.ReservationRepository;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 // ===== 4. RESERVATION SERVICE =====
 @Service

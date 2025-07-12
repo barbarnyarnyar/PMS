@@ -13,7 +13,7 @@ import com.tolimoli.pms.entity.Reservation;
 import com.tolimoli.pms.repository.FolioChargeRepository;
 import com.tolimoli.pms.repository.ReservationRepository;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 // ===== 5. FOLIO CHARGE SERVICE =====
 @Service
